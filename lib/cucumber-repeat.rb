@@ -1,5 +1,7 @@
 require 'colorize'
 
+require_relative('formatter.rb')
+
 $coloured_output = true
 
 WINDOWS       = RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
@@ -10,56 +12,45 @@ elsif (!ENV['ANSICON'].nil?) then
   $coloured_output =false
 end
 
-
 After('@repeat') do | scenario |
-
-  if (scenario.failed?)
-    scenario.steps.each do |step_details|
-      step_details.status!(:passed)
+  if (scenario.failed?) then
+    for i in 1..2
+      if (scenario.failed?)
+        $stdout.puts blue_text("  Test Failed, Retrying test")
+        run_scenario(scenario)
+      end
     end
-    $stdout.puts "  Test Failed, Retrying test".blue
-    run_scenario(scenario)
-  end
-  if (scenario.failed?)
-    scenario.steps.each do |step_details|
-      step_details.status!(:passed)
+    if (scenario.passed?) then
+      if (!$failures.nil?) then
+        $failures -= 1
+      end
     end
-    $stdout.puts "  Test Failed, Retrying test".blue
-    run_scenario(scenario)
   end
 end
 
 
-def run_scenario(scenario)
 
+def run_scenario(scenario)
   scenario.steps.each do |step_details|
-    if (!scenario.failed?)
-      begin
-        step step_details.name.to_s, step_details.multiline_arg
-        $stdout.puts "    " + green_text(step_details.name.strip)
-        if (!step_details.multiline_arg.to_s.empty?) then
-          $stdout.puts "  " + green_text(step_details.multiline_arg.to_s.gsub(/\e\[(\d+)m/, '').strip)
-        end
-        step_details.status!(:passed)
-      rescue Exception => e
-        $stdout.puts "    " + red_text(step_details.name.strip)
-        if (!step_details.multiline_arg.to_s.empty?) then
-          $stdout.puts "  " + red_text(step_details.multiline_arg.to_s.gsub(/\e\[(\d+)m/, '').strip)
-        end
-        $stdout.puts e.to_s.red
-        step_details.status!(:failed)
-      end
-    else
-      $stdout.puts "    " + yellow_text(step_details.name.strip)
+    begin
+      step step_details.name.to_s, step_details.multiline_arg
+      $stdout.puts "    " + green_text(step_details.name.strip)
       if (!step_details.multiline_arg.to_s.empty?) then
-        $stdout.puts "  " + yellow_text(step_details.multiline_arg.to_s.gsub(/\e\[(\d+)m/, '').strip)
+        $stdout.puts "  " + green_text(step_details.multiline_arg.to_s.gsub(/\e\[(\d+)m/, '').strip)
       end
+      step_details.status!(:passed)
+    rescue Exception => e
+      $stdout.puts "    " + red_text(step_details.name.strip)
+      if (!step_details.multiline_arg.to_s.empty?) then
+        $stdout.puts "  " + red_text(step_details.multiline_arg.to_s.gsub(/\e\[(\d+)m/, '').strip)
+      end
+      $stdout.puts e.to_s.red
+      step_details.status!(:failed)
     end
   end
 end
 
 def green_text(text)
-
   if ($coloured_output == true) then
     text = text.green
   end
@@ -67,7 +58,6 @@ def green_text(text)
 end
 
 def red_text(text)
-
   if ($coloured_output == true) then
     text = text.red
   end
@@ -75,9 +65,15 @@ def red_text(text)
 end
 
 def yellow_text(text)
-
   if ($coloured_output == true) then
     text = text.yellow
+  end
+  return text
+end
+
+def blue_text(text)
+  if ($coloured_output == true) then
+    text = text.blue
   end
   return text
 end
