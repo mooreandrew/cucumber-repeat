@@ -50,3 +50,14 @@ To output as Junit and Pretty:
 ```
 cucumber --format Cucumber::Formatter::Pretty --format Cucumber::Formatter::JunitRepeater --out results/
 ```
+
+Repeat Attempts
+============
+
+The default retries is 2, but you can override the amount:
+
+```
+cucumber REPEAT=5
+```
+
+This will repeat a test up to 5 times.
