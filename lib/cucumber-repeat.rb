@@ -4,6 +4,13 @@ require_relative('formatter.rb')
 
 $coloured_output = true
 
+
+$repeat_tries = (ENV['REPEATER'].to_i || 2)
+
+if ($repeat_tries == 0) then
+  $repeat_tries = 2
+end
+
 WINDOWS       = RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
 
 if (WINDOWS.nil?) then
@@ -14,7 +21,7 @@ end
 
 After('@repeat') do | scenario |
   if (scenario.failed?) then
-    for i in 1..2
+    for i in 1..$repeat_tries
       if (scenario.failed?)
         $stdout.puts blue_text("  Test Failed, Retrying test")
         run_scenario(scenario)

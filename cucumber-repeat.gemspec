@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'cucumber-repeat'
-  s.version     = '0.0.3'
-  s.date        = '2014-10-28'
+  s.version     = '0.0.4'
+  s.date        = '2014-10-29'
   s.summary     = ""
   s.description = "This gem will auto repeat a scenario if it fails up to 2 additional times"
   s.authors     = ["Andrew Moore"]
